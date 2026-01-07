@@ -1,3 +1,4 @@
+"""Flask server for Watson Emotion Detector"""
 from flask import Flask, request, render_template
 from EmotionDetection.emotion_detection import emotion_detector
 
@@ -5,6 +6,7 @@ app = Flask(__name__)
 
 @app.route("/emotionDetector", methods=["GET"])
 def emotion_detector_api():
+    """route for calling emotion detector with user-entered string"""
     text_to_analyze = request.args.get("textToAnalyze")
     emotion_analysis = emotion_detector(text_to_analyze)
     if emotion_analysis["anger"] is None:
@@ -22,11 +24,10 @@ def emotion_detector_api():
         )
     return response_string
 
-
 @app.route("/")
 def display_index():
+    """route for displaying main app page"""
     return render_template("index.html")
-
 
 if __name__ == "__main__":
     app.run(debug=True)
