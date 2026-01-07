@@ -15,11 +15,16 @@ def emotion_detector(text_to_analyze):
                              json=input_json,
                              headers=watson_headers,
                              timeout=5000)
-    # convert response to dict and extract required data
-    response_dict = json.loads(response.text)
-    emotion_dict = response_dict["emotionPredictions"][0]["emotion"]
-    # determine "dominant emotion"
-    dominant_emotion = max(emotion_dict.items(),
-                           key=lambda epair: epair[1])[0]
-    emotion_dict["dominant_emotion"] = dominant_emotion
+    # check for error
+    if response.status_code == 400:
+        emotion_dict = {"anger": None, "disgust": None, "fear": None,
+                        "joy": None, "sadness": None, "dominant_emotion": None}
+    else:
+        # convert response to dict and extract required data
+        response_dict = json.loads(response.text)
+        emotion_dict = response_dict["emotionPredictions"][0]["emotion"]
+        # determine "dominant emotion"
+        dominant_emotion = max(emotion_dict.items(),
+                            key=lambda epair: epair[1])[0]
+        emotion_dict["dominant_emotion"] = dominant_emotion
     return emotion_dict
