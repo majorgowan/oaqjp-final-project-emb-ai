@@ -1,3 +1,4 @@
+import json
 import requests
 
 def emotion_detector(text_to_analyze):
@@ -9,9 +10,16 @@ def emotion_detector(text_to_analyze):
     input_json = {
         "raw_document": {"text": text_to_analyze} 
     }
-
+    # call Watson emotion analyzer
     response = requests.post(watson_url,
                              json=input_json,
                              headers=watson_headers,
                              timeout=5000)
-    return response.text
+    # convert response to dict and extract required data
+    response_dict = json.loads(response.text)
+    emotion_dict = response_dict["emotionPredictions"][0]["emotion"]
+    # determine "dominant emotion"
+    dominant_emotion = max(emotion_dict.items(),
+                           key=lambda epair: epair[1])[0]
+    emotion_dict["dominant_emotion"] = dominant_emotion
+    return emotion_dict
